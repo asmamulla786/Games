@@ -38,7 +38,7 @@ function isSubString(string, otherString) {
   return isSubStringFound(string, otherString, 0);
 }
 
-function assignColour(digit) {
+function getColor(digit) {
   switch (digit) {
     case '9': return BROWN;
     case '1': return RED;
@@ -52,40 +52,33 @@ function assignColour(digit) {
   }
 }
 
-function getNumber(secretCode, secretNumber) {
+function getRandomNumber() {
+  return 1 + Math.ceil(Math.random() * 8) + "";
+}
+
+function getRandomSectetCode(secretCode, secretNumber) {
   if (secretNumber.length >= 4) {
     return secretNumber;
   }
 
-  let number = "" + Math.ceil(Math.random() * 9);
-
-  if (number == '0') {
-    number = '9';
-  } 
+  const number = getRandomNumber();
 
   if (!isSubString(secretNumber, number)) {
     secretNumber = secretNumber + number
-    secretCode = secretCode + assignColour(number);
+    secretCode = secretCode + getColor(number);
   }
 
-  return getNumber(secretCode, secretNumber);
+  return getRandomSectetCode(secretCode, secretNumber);
 }
 
-function pointNToC(color, number) {
-  return color + " -> " + number;
-}
+function pointNToC(number) {
+  if (number === 10) {
+    return "";
+  }
 
-function getAllColours() {
-  let allColours = pointNToC(assignColour('1'), '1') + " ";
-  allColours += pointNToC(assignColour('2'), '2') + " ";
-  allColours += pointNToC(assignColour('3'), '3') + " ";
-  allColours += pointNToC(assignColour('4'), '4') + " ";
-  allColours += pointNToC(assignColour('5'), '5') + " ";
-  allColours += pointNToC(assignColour('6'), '6') + " ";
-  allColours += pointNToC(assignColour('7'), '7') + " ";
-  allColours += pointNToC(assignColour('8'), '8') + " ";
-  allColours += pointNToC(assignColour('9'), '9') + " ";
-  return allColours;
+  const color = getColor(number + '');
+
+  return color + "->" + number + " " + pointNToC(number + 1);
 }
 
 function convertToColor(number, color, index) {
@@ -93,7 +86,7 @@ function convertToColor(number, color, index) {
     return color;
   }
 
-  return convertToColor(number, color + assignColour(number[index]), index + 1);
+  return convertToColor(number, color + getColor(number[index]), index + 1);
 
 }
 
@@ -142,7 +135,6 @@ function getMatches(number, index, match) {
     match = match + getMark(number, index);
   }
 
-  // console.log("Match :: ", match);
   return getMatches(number, index + 1, match);
 }
 
@@ -150,14 +142,15 @@ function sorryMsg(guessedColor) {
   let msg = "\nTHE NUMBER IS " + secretCode + " " + guessedColor + "\n";
   msg += "\n🙁 SORRY YOU LOST THE GAME \n";
   msg += "\n👍 BETTER LUCK FOR NEXT TIME \n";
+
   return msg;
 }
 
-function enterGuess(chances) {
+function playGame(chances) {
   const guessedNumber = prompt("");
-
   const guessedColor = convertToColor(guessedNumber, "", 0);
-  let guessed = "-----------> ::   " + guessedColor + " "; 
+
+  let guessed = repeat("-", 11) + "> ::   " + guessedColor + " ";
   guessed += getMatches(guessedNumber, 0, "");
   console.log(guessed);
   console.log("CHANCES LEFT :: " + chances);
@@ -169,24 +162,37 @@ function enterGuess(chances) {
   if (chances < 1) {
     return sorryMsg(guessedColor);
   }
-  return enterGuess(chances - 1);
+  return playGame(chances - 1);
 
 }
+
+function repeat(string, noOfTimes) {
+  if (noOfTimes < 1) {
+    return "";
+  }
+
+  return string + repeat(string, noOfTimes - 1);
+}
+
 
 function introduction() {
-  console.log("\n----------------- 🔥 WELCOME TO MASTERMIND 🔥 ---------------\n");
-  console.log("👉 NUMBERS FROM 1 TO 9 ");
-  console.log("👉 GUESSING NUMBER SHOULD BE FOUR DIGIT NUMBER");
-  console.log("👉 ❎ INDICATES THAT COLOR IS PRESENT IN THE SEQUENCE BUT POSITION NOT MATCH ");
-  console.log("👉 ✅ INDICATES THAT COLOR PRESENT AT CORRECT POTISION")
-  return "";
+  let intro = "\n" + repeat("-", 15) + " 🔥 WELCOME TO MASTERMIND 🔥 ";
+
+  intro += repeat("-", 15) + "\n";
+  intro += "👉 NUMBERS FROM 1 TO 9 ";
+  intro += "\n👉 GUESSING NUMBER SHOULD BE FOUR DIGIT NUMBER";
+  intro += "\n👉 ❎ INDICATES THAT COLOR IS PRESENT IN THE SEQUENCE ";
+  intro += "BUT POSITION NOT MATCH ";
+  intro += "\n👉 ✅ INDICATES THAT COLOR PRESENT AT CORRECT POTISION";
+
+  return intro;
 }
 
-const allColours = getAllColours();
-const secretCode = getNumber("", "");
+const allColours = pointNToC(1);
+const secretCode = getRandomSectetCode("", "");
 // console.log(secretCode)
 
 console.log(introduction());
 console.log(allColours);
-console.log(enterGuess(9));
+console.log(playGame(9));
 

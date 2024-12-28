@@ -1,19 +1,10 @@
-const GREEN = '🟢';
-const RED = '🔴';
-const BLUE = '🔵';
-const YELLOW = '🟡';
-const WHITE = '⚪️';
-const ORANGE = '🟠';
-const PURPLE = '🟣';
-const BROWN = '🟤';
-const BLACK = '⚫️';
-
-
 function matchAtPosition(string, target, index, subIndex) {
   if (subIndex < target.length) {
     const isSame = string[index + subIndex] === target[subIndex];
 
-    return isSame ? matchAtPosition(string, target, index, subIndex + 1) : false;
+    return isSame
+      ? matchAtPosition(string, target, index, subIndex + 1)
+      : false;
   }
 
   return true;
@@ -27,7 +18,6 @@ function isSubStringFound(string, target, index) {
   }
 
   return false;
-
 }
 
 function isSubString(string, otherString) {
@@ -39,17 +29,18 @@ function isSubString(string, otherString) {
 }
 
 function getColor(digit) {
-  switch (digit) {
-    case '9': return BROWN;
-    case '1': return RED;
-    case '2': return BLUE;
-    case '3': return YELLOW;
-    case '4': return WHITE;
-    case '5': return BLACK;
-    case '6': return ORANGE;
-    case '7': return PURPLE;
-    case '8': return GREEN;
-  }
+  const colours = {
+    1: "⚫️",
+    2: "🟢",
+    3: "🟣",
+    4: "⚪️",
+    5: "🟠",
+    6: "🟡",
+    7: "🔴",
+    8: "🟤",
+    9: "🔵",
+  };
+  return colours[digit];
 }
 
 function getRandomNumber() {
@@ -64,7 +55,7 @@ function getRandomSectetCode(secretCode, secretNumber) {
   const number = getRandomNumber();
 
   if (!isSubString(secretNumber, number)) {
-    secretNumber = secretNumber + number
+    secretNumber = secretNumber + number;
     secretCode = secretCode + getColor(number);
   }
 
@@ -76,7 +67,7 @@ function pointNToC(number) {
     return "";
   }
 
-  const color = getColor(number + '');
+  const color = getColor(number + "");
 
   return color + "->" + number + " " + pointNToC(number + 1);
 }
@@ -87,48 +78,19 @@ function convertToColor(number, color, index) {
   }
 
   return convertToColor(number, color + getColor(number[index]), index + 1);
-
 }
 
 function getMark(number, index) {
-  return secretCode[index] === number[index] ? '✅' : '❎';
-}
-
-function shuffleTwo(string) {
-  return string[1] + string[0];
-}
-
-function shuffleThree(string) {
-  return string[1] + string[0] + string[2];
-}
-
-function shuffleFour(string) {
-  return string[1] + string[0] + string[3] + string[2];
+  return secretCode[index] === number[index] ? "✅" : "❎";
 }
 
 function shuffle(string) {
-  switch (string.length) {
-    case 0: return string + "      ";
-    case 1: return string + "     "
-    case 2: return shuffleTwo(string) + "   ";
-    case 3: return shuffleThree(string) + "  ";
-    case 4: return shuffleFour(string);
-  }
-
-  return string;
-}
-
-function getShuffled(string, noOfTimes) {
-  if (noOfTimes === 0) {
-    return string;
-  }
-
-  return getShuffled(shuffle(string), noOfTimes - 1);
+  return [...string].sort(() => Math.random() - 0.5).join("");
 }
 
 function getMatches(number, index, match) {
   if (index === 4) {
-    return getShuffled(match, Math.ceil(Math.random()) * 10);
+    return shuffle(match);
   }
 
   if (isSubString(secretCode, number[index])) {
@@ -138,8 +100,8 @@ function getMatches(number, index, match) {
   return getMatches(number, index + 1, match);
 }
 
-function sorryMsg(guessedColor) {
-  let msg = "\nTHE NUMBER IS " + secretCode + " " + guessedColor + "\n";
+function sorryMsg() {
+  let msg = "\nTHE NUMBER IS " + secretCode + " " + secretColor + "\n";
   msg += "\n🙁 SORRY YOU LOST THE GAME \n";
   msg += "\n👍 BETTER LUCK FOR NEXT TIME \n";
 
@@ -163,7 +125,6 @@ function playGame(chances) {
     return sorryMsg(guessedColor);
   }
   return playGame(chances - 1);
-
 }
 
 function repeat(string, noOfTimes) {
@@ -173,7 +134,6 @@ function repeat(string, noOfTimes) {
 
   return string + repeat(string, noOfTimes - 1);
 }
-
 
 function introduction() {
   let intro = "\n" + repeat("-", 15) + " 🔥 WELCOME TO MASTERMIND 🔥 ";
@@ -190,9 +150,9 @@ function introduction() {
 
 const allColours = pointNToC(1);
 const secretCode = getRandomSectetCode("", "");
-// console.log(secretCode)
+const secretColor = convertToColor(secretCode, "", 0);
+console.log(secretCode);
 
 console.log(introduction());
 console.log(allColours);
 console.log(playGame(9));
-

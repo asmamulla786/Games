@@ -151,7 +151,7 @@ function introduction() {
 const allColours = pointNToC(1);
 const secretCode = getRandomSectetCode("", "");
 const secretColor = convertToColor(secretCode, "", 0);
-console.log(secretCode);
+// console.log(secretCode);
 
 console.log(introduction());
 console.log(allColours);
